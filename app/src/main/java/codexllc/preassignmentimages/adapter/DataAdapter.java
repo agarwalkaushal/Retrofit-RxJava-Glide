@@ -27,8 +27,7 @@ import java.util.ArrayList;
 
 public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
-    @SerializedName("worldpopulation")
-    @Expose
+
     private ArrayList<photo> mAndroidList;
     private Context context;
     public DataAdapter(ArrayList<photo> androidList) {

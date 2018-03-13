@@ -18,7 +18,7 @@ import codexllc.preassignmentimages.network.RequestInterface;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import codexllc.preassignmentimages.model.worldpopulation;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -47,53 +47,59 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(layoutManager);
-        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mRecyclerView.setAdapter(adapter);
         loadJSON();
     }
     private void loadJSON() {
 
-        Log.e("Entered","loadJson");
         RequestInterface requestInterface = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(RequestInterface.class);
+        Log.e("RI", String.valueOf(requestInterface));
 
-        Observable<List<photo>> observable = requestInterface.register()
+        Observable<worldpopulation> observable = requestInterface.register()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io());
-        observable.subscribe(new Observer<List<photo>>() {
+        Log.e("RI", String.valueOf(observable));
+        observable.subscribe(new Observer<worldpopulation>() {
             @Override
-            public void onSubscribe(Disposable d) {
+                    public void onSubscribe(Disposable d) {
+
+                Log.e("Error","Yes");
 
             }
 
             @Override
-            public void onNext(List<photo> value) {
-                list = new ArrayList<>(value);
-                for (int i = 0; i < value.size(); i++) {
+            public void onNext(worldpopulation value) {
+                Log.e("onNext","entered");
+                Log.e("Value is", String.valueOf(value));
+                list = new ArrayList<>(value.getPhotos());
+
+
+                for (int i = 0; i < value.getPhotos().size(); i++) {
 
                     photo model = new photo();
-                    model.setUrl(value.get(i).getUrl());
-                    Log.e("Url is: ",value.get(i).getUrl());
+                    model.setUrl(value.getPhotos().get(i).getUrl());
+                    Log.e("Url is: ",value.getPhotos().get(i).getUrl());
                     list.add(model);
                 }
-                adapter= new DataAdapter(list);
-                mRecyclerView.setAdapter(adapter);
 
             }
 
             @Override
             public void onError(Throwable e) {
+                handleError(e);
 
             }
 
             @Override
             public void onComplete() {
-
+                adapter= new DataAdapter(list);
+                mRecyclerView.setAdapter(adapter);
             }
 
         });
@@ -104,12 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void handleError(Throwable error) {
 
-        Toast.makeText(this, "Error " + error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+       Log.e("Error " ,error.getLocalizedMessage());
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mCompositeDisposable.clear();
-    }
 }
