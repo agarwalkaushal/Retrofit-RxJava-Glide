@@ -6,6 +6,8 @@ package codexllc.preassignmentimages.adapter;
 
 import android.content.ContentProvider;
 import android.content.Context;
+import android.content.Intent;
+import codexllc.preassignmentimages.fullImage;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.annotations.Expose;
@@ -30,6 +33,7 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
 
     private ArrayList<photo> mAndroidList;
     private Context context;
+    String url;
     public DataAdapter(ArrayList<photo> androidList) {
         mAndroidList = androidList;
     }
@@ -61,8 +65,20 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.ViewHolder> {
         private ImageView imageView;
         public ViewHolder(View view) {
             super(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
+                    url = mAndroidList.get(getAdapterPosition()).getUrl();
+                    Intent intent = new Intent(context, fullImage.class);
+                    intent.putExtra("url",url);
+                    context.startActivity(intent);
+                    //Toast.makeText(view.getContext(), "Item is clicked", Toast.LENGTH_SHORT).show();
+                }
+
+            });
             imageView = (ImageView) view.findViewById(R.id.image);
         }
     }
+
 }
